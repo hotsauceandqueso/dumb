@@ -55,9 +55,9 @@
     <div id="player-wrapper">
         <h2 id="movie-title" style="margin-bottom: 5px;"></h2>
         <div class="controls">
-            <button class="srv" onclick="load(1)">Server 1</button>
-            <button class="srv" onclick="load(2)">Server 2</button>
-            <button class="srv" onclick="load(3)">Server 3</button>
+            <button class="srv" onclick="load(1)">Server 1 (.ru)</button>
+            <button class="srv" onclick="load(2)">Server 2 (.su)</button>
+            <button class="srv" onclick="load(3)">Server 3 (me)</button>
         </div>
         <div class="video-box">
             <iframe id="vid-frame" 
@@ -86,15 +86,19 @@
 
     function load(server) {
         const frame = document.getElementById('vid-frame');
-        frame.src = "about:blank"; // Reset handshake
+        frame.src = "about:blank"; // Force clean reset
         
         let url = '';
-        // Using verified 'movie' endpoint for feature films
-        if(server === 1) url = `https://vidsrc.to/embed/movie/${activeId}`;
-        if(server === 2) url = `https://vidsrc.xyz/embed/movie/${activeId}`;
-        if(server === 3) url = `https://embed.su/embed/movie/${activeId}`;
         
-        // Short delay ensures the browser processes the 'about:blank' reset first
+        /**
+         * Updated endpoints based on your Vidsrc API documentation.
+         * Using the primary /embed/movie/ path with TMDB IDs.
+         **/
+        if(server === 1) url = `https://vidsrc-embed.ru/embed/movie/${activeId}?autoplay=1`;
+        if(server === 2) url = `https://vidsrc-embed.su/embed/movie/${activeId}?autoplay=1`;
+        if(server === 3) url = `https://vidsrcme.su/embed/movie/${activeId}?autoplay=1`;
+        
+        // Short delay to ensure the browser processes the 'about:blank' reset first
         setTimeout(() => { frame.src = url; }, 50);
     }
 </script>

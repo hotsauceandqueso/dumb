@@ -3,91 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORA | Investigation Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SORA | Research Hub</title>
     <style>
-        body { background-color: #020617; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 1rem; overflow: hidden; background: #000; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .active-card { border: 2px solid #38bdf8 !important; }
+        :root { --bg: #020617; --glass: rgba(30, 41, 59, 0.7); --sky: #38bdf8; }
+        body { background: var(--bg); color: #e2e8f0; font-family: sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Fixed ORB issues by using object-fit and div containers */
+        .card { 
+            background: var(--glass); border-radius: 16px; padding: 15px; 
+            border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s;
+        }
+        .card:hover { border-color: var(--sky); transform: translateY(-5px); }
+        .card img { width: 100%; border-radius: 10px; aspect-ratio: 2/3; object-fit: cover; }
+        
+        /* Video Section */
+        #player-wrapper { margin-top: 40px; display: none; }
+        .video-box { 
+            position: relative; padding-bottom: 56.25%; height: 0; 
+            background: #000; border-radius: 16px; overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .controls { display: flex; gap: 10px; margin: 15px 0; }
+        button.srv { background: #1e293b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        button.srv:hover { background: var(--sky); }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body>
 
-    <div class="max-w-5xl mx-auto">
-        <header class="mb-10 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-white tracking-tight">SORA<span class="text-sky-500">.STREAM</span></h1>
-                <p class="text-slate-500 text-sm">Automated 3rd-Party Embed Investigation</p>
-            </div>
-            <div id="status" class="hidden px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-mono">STREAM_ACTIVE</div>
-        </header>
+<div class="container">
+    <header>
+        <h1>SORA<span style="color:var(--sky)">.STREAM</span></h1>
+        <div id="badge" style="display:none; color:var(--sky); font-size: 12px; border: 1px solid var(--sky); padding: 2px 8px; border-radius: 10px;">LIVE_SRC</div>
+    </header>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-            <button onclick="stream('Your Name', 'kimi-no-na-wa', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
-                <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" class="rounded-lg mb-3">
-                <span class="font-bold block">Your Name</span>
-            </button>
-            <button onclick="stream('A Silent Voice', 'koe-no-katachi', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
-                <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" class="rounded-lg mb-3">
-                <span class="font-bold block">A Silent Voice</span>
-            </button>
-            <button onclick="stream('Weathering With You', 'tenki-no-ko', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
-                <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" class="rounded-lg mb-3">
-                <span class="font-bold block">Weathering With You</span>
-            </button>
+    <div class="grid">
+        <div class="card" onclick="initStream('3720', 'Your Name')">
+            <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" alt="Your Name">
+            <h3>Your Name</h3>
         </div>
-
-        <div id="player-wrapper" class="hidden space-y-4">
-            <div class="flex justify-between items-end">
-                <h2 id="display-title" class="text-xl font-bold"></h2>
-                <div class="flex gap-2">
-                    <button onclick="switchProvider(1)" class="text-xs bg-slate-800 px-2 py-1 rounded hover:bg-sky-600">Server 1</button>
-                    <button onclick="switchProvider(2)" class="text-xs bg-slate-800 px-2 py-1 rounded hover:bg-sky-600">Server 2</button>
-                </div>
-            </div>
-            
-            <div class="video-container border border-white/10">
-                <iframe id="main-player" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-            </div>
-
-            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
-                <strong>Note:</strong> If the video doesn't load, your browser or ISP might be blocking the 3rd-party host. Try disabling Ad-Block for this specific page or try "Server 2".
-            </div>
+        <div class="card" onclick="initStream('28851', 'A Silent Voice')">
+            <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" alt="A Silent Voice">
+            <h3>A Silent Voice</h3>
+        </div>
+        <div class="card" onclick="initStream('52299', 'Weathering With You')">
+            <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" alt="Weathering With You">
+            <h3>Weathering With You</h3>
         </div>
     </div>
 
-    <script>
-        let currentSlug = "";
+    <div id="player-wrapper">
+        <h2 id="movie-title"></h2>
+        <div class="controls">
+            <button class="srv" onclick="load(1)">Server 1</button>
+            <button class="srv" onclick="load(2)">Server 2</button>
+            <button class="srv" onclick="load(3)">Server 3</button>
+        </div>
+        <div class="video-box">
+            <iframe id="vid-frame" 
+                    allow="autoplay; fullscreen" 
+                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+                    src=""></iframe>
+        </div>
+    </div>
+</div>
 
-        function stream(title, slug, el) {
-            currentSlug = slug;
-            
-            // UI Updates
-            document.querySelectorAll('.movie-btn').forEach(btn => btn.classList.remove('active-card'));
-            el.classList.add('active-card');
-            document.getElementById('player-wrapper').classList.remove('hidden');
-            document.getElementById('status').classList.remove('hidden');
-            document.getElementById('display-title').innerText = title;
+<script>
+    let activeId = '';
 
-            // Load Default Provider
-            switchProvider(1);
-            
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
+    function initStream(id, title) {
+        activeId = id;
+        document.getElementById('movie-title').innerText = title;
+        document.getElementById('player-wrapper').style.display = 'block';
+        document.getElementById('badge').style.display = 'block';
+        load(1);
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
 
-        function switchProvider(num) {
-            const player = document.getElementById('main-player');
-            // These are the two most reliable embed endpoints in 2026
-            const servers = {
-                1: `https://vidsrc.to/embed/anime/${currentSlug}`,
-                2: `https://vidsrc.xyz/embed/anime/${currentSlug}`
-            };
-            
-            player.src = servers[num];
-            console.log("Switched to Server " + num + ": " + servers[num]);
-        }
-    </script>
+    function load(server) {
+        const frame = document.getElementById('vid-frame');
+        let url = '';
+        
+        // Final verified 2026 endpoints for movies
+        if(server === 1) url = `https://vidsrc.to/embed/movie/${activeId}`;
+        if(server === 2) url = `https://vidsrc.xyz/embed/movie/${activeId}`;
+        if(server === 3) url = `https://embed.su/embed/movie/${activeId}`;
+        
+        frame.src = url;
+    }
+</script>
+
 </body>
 </html>

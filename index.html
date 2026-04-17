@@ -8,60 +8,47 @@
         :root { --bg: #020617; --glass: rgba(30, 41, 59, 0.7); --sky: #38bdf8; }
         body { background: var(--bg); color: #e2e8f0; font-family: sans-serif; margin: 0; padding: 20px; overflow-x: hidden; }
         .container { max-width: 1000px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { 
-            background: var(--glass); border-radius: 16px; padding: 15px; 
-            border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { background: var(--glass); border-radius: 16px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; }
         .card:hover { border-color: var(--sky); transform: translateY(-5px); }
         .card img { width: 100%; border-radius: 10px; aspect-ratio: 2/3; object-fit: cover; pointer-events: none; }
-        #player-wrapper { margin-top: 40px; display: none; animation: fadeIn 0.5s ease-in; }
-        .video-box { 
-            position: relative; padding-bottom: 56.25%; height: 0; 
-            background: #000; border-radius: 16px; overflow: hidden;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-        }
+        #player-wrapper { margin-top: 40px; display: none; }
+        .video-box { position: relative; padding-bottom: 56.25%; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--sky); }
         iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .controls { display: flex; gap: 10px; margin: 15px 0; }
-        button.srv { background: #1e293b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        button.srv:hover { background: var(--sky); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .srv-btn { background: #1e293b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; }
+        .srv-btn:hover { background: var(--sky); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>SORA<span style="color:var(--sky)">.STREAM</span></h1>
-        <div id="badge" style="display:none; color:var(--sky); font-size: 11px; border: 1px solid var(--sky); padding: 2px 8px; border-radius: 10px; font-family: monospace;">HANDSHAKE_OK</div>
-    </header>
+    <header><h1>SORA<span style="color:var(--sky)">.STREAM</span></h1></header>
 
     <div class="grid">
-        <div class="card" onclick="initStream('372054', 'Your Name')">
-            <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" alt="Your Name">
+        <div class="card" onclick="init('372054', 'Your Name')">
+            <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg">
             <h3>Your Name</h3>
         </div>
-        <div class="card" onclick="initStream('378064', 'A Silent Voice')">
-            <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" alt="A Silent Voice">
+        <div class="card" onclick="init('378064', 'A Silent Voice')">
+            <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg">
             <h3>A Silent Voice</h3>
         </div>
-        <div class="card" onclick="initStream('568160', 'Weathering With You')">
-            <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" alt="Weathering With You">
+        <div class="card" onclick="init('568160', 'Weathering With You')">
+            <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg">
             <h3>Weathering With You</h3>
         </div>
     </div>
 
     <div id="player-wrapper">
-        <h2 id="movie-title" style="margin-bottom: 5px;"></h2>
-        <div class="controls">
-            <button class="srv" onclick="load(1)">Server 1</button>
-            <button class="srv" onclick="load(2)">Server 2</button>
-            <button class="srv" onclick="load(3)">Server 3</button>
+        <h2 id="m-title"></h2>
+        <div style="margin: 10px 0;">
+            <button class="srv-btn" onclick="load(1)">Server 1 (Direct)</button>
+            <button class="srv-btn" onclick="load(2)">Server 2 (Aggregator)</button>
+            <button class="srv-btn" onclick="load(3)">Server 3 (Pro)</button>
         </div>
         <div class="video-box">
             <iframe id="vid-frame" 
-                    allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
+                    allow="autoplay; fullscreen; encrypted-media" 
                     referrerpolicy="no-referrer"
                     sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
                     src=""></iframe>
@@ -72,32 +59,26 @@
 <script>
     let activeId = '';
 
-    function initStream(id, title) {
+    function init(id, title) {
         activeId = id;
-        document.getElementById('movie-title').innerText = title;
+        document.getElementById('m-title').innerText = title;
         document.getElementById('player-wrapper').style.display = 'block';
-        document.getElementById('badge').style.display = 'block';
         load(1);
-        
-        setTimeout(() => {
-            window.scrollTo({ top: document.getElementById('player-wrapper').offsetTop - 20, behavior: 'smooth' });
-        }, 100);
     }
 
     function load(server) {
         const frame = document.getElementById('vid-frame');
+        frame.src = "about:blank"; // Critical to reset the browser's origin-check
         
-        // Use a hidden hash to bypass simple URL scrapers
         let url = '';
-        if(server === 1) url = `https://vidsrc-embed.ru/embed/movie/${activeId}?autoplay=1`;
-        if(server === 2) url = `https://vidsrc-embed.su/embed/movie/${activeId}?autoplay=1`;
-        if(server === 3) url = `https://vidsrcme.su/embed/movie/${activeId}?autoplay=1`;
+        // These specific endpoints are configured to allow cross-origin iframes
+        if(server === 1) url = `https://vidsrc.xyz/embed/movie/${activeId}`;
+        if(server === 2) url = `https://embed.su/embed/movie/${activeId}`;
+        if(server === 3) url = `https://vidsrc.to/embed/movie/${activeId}`;
         
-        // FORCE RELOAD: Some browsers cache the 404/Empty state
-        frame.removeAttribute('src');
         setTimeout(() => {
-            frame.setAttribute('src', url);
-        }, 100);
+            frame.src = url;
+        }, 150);
     }
 </script>
 

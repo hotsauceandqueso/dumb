@@ -38,15 +38,15 @@
     </header>
 
     <div class="grid">
-        <div class="card" onclick="initStream('3720', 'Your Name')">
+        <div class="card" onclick="initStream('372054', 'Your Name')">
             <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" alt="Your Name">
             <h3>Your Name</h3>
         </div>
-        <div class="card" onclick="initStream('28851', 'A Silent Voice')">
+        <div class="card" onclick="initStream('378064', 'A Silent Voice')">
             <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" alt="A Silent Voice">
             <h3>A Silent Voice</h3>
         </div>
-        <div class="card" onclick="initStream('52299', 'Weathering With You')">
+        <div class="card" onclick="initStream('568160', 'Weathering With You')">
             <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" alt="Weathering With You">
             <h3>Weathering With You</h3>
         </div>
@@ -63,7 +63,7 @@
             <iframe id="vid-frame" 
                     allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
                     referrerpolicy="no-referrer"
-                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+                    sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation allow-downloads"
                     src=""></iframe>
         </div>
     </div>
@@ -78,7 +78,7 @@
         document.getElementById('player-wrapper').style.display = 'block';
         document.getElementById('badge').style.display = 'block';
         load(1);
-        // Smooth scroll to player
+        
         setTimeout(() => {
             window.scrollTo({ top: document.getElementById('player-wrapper').offsetTop - 20, behavior: 'smooth' });
         }, 100);
@@ -86,15 +86,16 @@
 
     function load(server) {
         const frame = document.getElementById('vid-frame');
-        // Setting src to empty first forces a clean reload of the handshake
-        frame.src = "about:blank";
+        frame.src = "about:blank"; // Reset handshake
         
         let url = '';
+        // Using verified 'movie' endpoint for feature films
         if(server === 1) url = `https://vidsrc.to/embed/movie/${activeId}`;
         if(server === 2) url = `https://vidsrc.xyz/embed/movie/${activeId}`;
         if(server === 3) url = `https://embed.su/embed/movie/${activeId}`;
         
-        setTimeout(() => { frame.src = url; }, 10);
+        // Short delay ensures the browser processes the 'about:blank' reset first
+        setTimeout(() => { frame.src = url; }, 50);
     }
 </script>
 

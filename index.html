@@ -5,84 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SORA | Investigation Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; }
+        body { background-color: #020617; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .movie-card:hover img { transform: scale(1.05); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 1rem; overflow: hidden; box-shadow: 0 0 50px rgba(56, 189, 248, 0.15); }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 1rem; overflow: hidden; background: #000; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .active-card { border: 2px solid #38bdf8 !important; }
     </style>
 </head>
-<body class="text-slate-200 min-h-screen pb-20">
+<body class="p-4 md:p-10">
 
-    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto">
-        <div class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-indigo-500 bg-clip-text text-transparent">SORA.STREAM</div>
-        <div class="px-4 py-1 rounded-full glass text-xs text-sky-400 font-mono tracking-tighter">MODE: RESEARCH_2026</div>
-    </nav>
-
-    <main class="max-w-6xl mx-auto px-6 mt-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div onclick="play('kimi-no-na-wa', 'Your Name')" class="movie-card group cursor-pointer relative overflow-hidden rounded-2xl glass p-3">
-                <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" class="rounded-xl w-full">
-                <div class="mt-4 px-2">
-                    <h3 class="font-bold text-lg group-hover:text-sky-400 transition-colors">Your Name</h3>
-                    <p class="text-xs text-slate-500">2016 • Makoto Shinkai</p>
-                </div>
+    <div class="max-w-5xl mx-auto">
+        <header class="mb-10 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-white tracking-tight">SORA<span class="text-sky-500">.STREAM</span></h1>
+                <p class="text-slate-500 text-sm">Automated 3rd-Party Embed Investigation</p>
             </div>
+            <div id="status" class="hidden px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-mono">STREAM_ACTIVE</div>
+        </header>
 
-            <div onclick="play('koe-no-katachi', 'A Silent Voice')" class="movie-card group cursor-pointer relative overflow-hidden rounded-2xl glass p-3">
-                <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" class="rounded-xl w-full">
-                <div class="mt-4 px-2">
-                    <h3 class="font-bold text-lg group-hover:text-sky-400 transition-colors">A Silent Voice</h3>
-                    <p class="text-xs text-slate-500">2016 • Naoko Yamada</p>
-                </div>
-            </div>
-
-            <div onclick="play('tenki-no-ko', 'Weathering With You')" class="movie-card group cursor-pointer relative overflow-hidden rounded-2xl glass p-3">
-                <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" class="rounded-xl w-full">
-                <div class="mt-4 px-2">
-                    <h3 class="font-bold text-lg group-hover:text-sky-400 transition-colors">Weathering With You</h3>
-                    <p class="text-xs text-slate-500">2019 • Makoto Shinkai</p>
-                </div>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <button onclick="stream('Your Name', 'kimi-no-na-wa', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
+                <img src="https://image.tmdb.org/t/p/w500/q719jXXLsVp68uUFWw9ptmEMQgy.jpg" class="rounded-lg mb-3">
+                <span class="font-bold block">Your Name</span>
+            </button>
+            <button onclick="stream('A Silent Voice', 'koe-no-katachi', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
+                <img src="https://image.tmdb.org/t/p/w500/tuFaR0v40vI6N1p6T7At0A9df6A.jpg" class="rounded-lg mb-3">
+                <span class="font-bold block">A Silent Voice</span>
+            </button>
+            <button onclick="stream('Weathering With You', 'tenki-no-ko', this)" class="movie-btn glass p-4 rounded-2xl hover:bg-slate-800 transition-all text-left">
+                <img src="https://image.tmdb.org/t/p/w500/7cn96S799UvYv9S696S66O97vI8.jpg" class="rounded-lg mb-3">
+                <span class="font-bold block">Weathering With You</span>
+            </button>
         </div>
 
-        <div id="player-view" class="hidden animate-in fade-in duration-700">
-            <div class="flex items-center justify-between mb-6">
-                <h2 id="active-title" class="text-3xl font-bold tracking-tight text-white">Select a Movie</h2>
-                <span class="text-slate-500 text-sm">Source: Vidsrc Aggregator</span>
+        <div id="player-wrapper" class="hidden space-y-4">
+            <div class="flex justify-between items-end">
+                <h2 id="display-title" class="text-xl font-bold"></h2>
+                <div class="flex gap-2">
+                    <button onclick="switchProvider(1)" class="text-xs bg-slate-800 px-2 py-1 rounded hover:bg-sky-600">Server 1</button>
+                    <button onclick="switchProvider(2)" class="text-xs bg-slate-800 px-2 py-1 rounded hover:bg-sky-600">Server 2</button>
+                </div>
             </div>
             
-            <div class="video-container glass border-sky-500/30 border">
-                <iframe id="video-frame" 
-                    src="" 
-                    allowfullscreen="true" 
-                    frameborder="0" 
-                    scrolling="no"></iframe>
+            <div class="video-container border border-white/10">
+                <iframe id="main-player" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             </div>
-            
-            <div class="mt-8 p-6 glass rounded-2xl border-l-4 border-sky-500">
-                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-widest">Research Note</h4>
-                <p class="text-slate-400 text-sm leading-relaxed">
-                    This sample uses an <strong>Iframe Overlay</strong> method. By loading the source through a 3rd-party embedder, we bypass the CORS restrictions you encountered earlier. The embedder handles the handshake with the video host, so your static GitHub page doesn't have to.
-                </p>
+
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs">
+                <strong>Note:</strong> If the video doesn't load, your browser or ISP might be blocking the 3rd-party host. Try disabling Ad-Block for this specific page or try "Server 2".
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        function play(slug, name) {
-            const view = document.getElementById('player-view');
-            const frame = document.getElementById('video-frame');
-            const title = document.getElementById('active-title');
+        let currentSlug = "";
 
-            // We use the 'vidsrc' embed pattern common in 2026
-            frame.src = `https://vidsrc.to/embed/anime/${slug}`;
-            title.innerText = name;
+        function stream(title, slug, el) {
+            currentSlug = slug;
             
-            view.classList.remove('hidden');
-            window.scrollTo({ top: view.offsetTop - 50, behavior: 'smooth' });
+            // UI Updates
+            document.querySelectorAll('.movie-btn').forEach(btn => btn.classList.remove('active-card'));
+            el.classList.add('active-card');
+            document.getElementById('player-wrapper').classList.remove('hidden');
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('display-title').innerText = title;
+
+            // Load Default Provider
+            switchProvider(1);
+            
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function switchProvider(num) {
+            const player = document.getElementById('main-player');
+            // These are the two most reliable embed endpoints in 2026
+            const servers = {
+                1: `https://vidsrc.to/embed/anime/${currentSlug}`,
+                2: `https://vidsrc.xyz/embed/anime/${currentSlug}`
+            };
+            
+            player.src = servers[num];
+            console.log("Switched to Server " + num + ": " + servers[num]);
         }
     </script>
 </body>
